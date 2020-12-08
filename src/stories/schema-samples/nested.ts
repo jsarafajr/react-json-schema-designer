@@ -2,9 +2,7 @@ import { JSONSchema7 } from 'json-schema';
 
 export const schema: JSONSchema7 = {
   type: 'object',
-  required: [
-    'fullName',
-  ],
+  required: ['fullName'],
   properties: {
     fullName: {
       type: 'string',
@@ -26,13 +24,13 @@ export const schema: JSONSchema7 = {
         country: {
           type: 'string',
         },
-      }
+      },
     },
     creditCard: {
       type: 'object',
       properties: {
         number: {
-          type: 'string'
+          type: 'string',
         },
         billingAddress: {
           type: 'object',
@@ -49,9 +47,9 @@ export const schema: JSONSchema7 = {
             country: {
               type: 'string',
             },
-          }
-        }
-      }
-    }
+          },
+        },
+      },
+    },
   },
 };

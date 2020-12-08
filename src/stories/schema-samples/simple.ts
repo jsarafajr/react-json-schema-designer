@@ -2,10 +2,7 @@ import { JSONSchema7 } from 'json-schema';
 
 export const schema: JSONSchema7 = {
   type: 'object',
-  required: [
-    'firstName',
-    'lastName'
-  ],
+  required: ['firstName', 'lastName'],
   properties: {
     firstName: {
       type: 'string',
@@ -13,11 +10,11 @@ export const schema: JSONSchema7 = {
     },
     lastName: {
       type: 'string',
-      title: 'Last name'
+      title: 'Last name',
     },
     telephone: {
       type: 'string',
       title: 'Telephone',
-    }
-  }
-}
+    },
+  },
+};

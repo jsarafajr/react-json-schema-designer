@@ -16,9 +16,11 @@ export const renameProperty = (schema: JSONSchema7, path: string[], newName: str
   // 2 steps back - fieldName and properties
   const parentSchemaPath = path.slice(0, path.length - 2);
 
-  return produce(schema, schemaDraft => {
-    const parentSchema = parentSchemaPath.length === 0 ? // lodash returns wrong value with empty array
-      schemaDraft : get(schemaDraft, path.slice(0, path.length - 2));
+  return produce(schema, (schemaDraft) => {
+    const parentSchema =
+      parentSchemaPath.length === 0 // lodash returns wrong value with empty array
+        ? schemaDraft
+        : get(schemaDraft, path.slice(0, path.length - 2));
 
     parentSchema.properties = renameObjectKey(parentSchema.properties, oldName, newName);
 
@@ -34,9 +36,11 @@ export const setPropertyRequire = (schema: JSONSchema7, path: string[], require:
   const fieldName = path[path.length - 1];
   const parentSchemaPath = path.slice(0, path.length - 2);
 
-  return produce(schema, schemaDraft => {
-    const parentSchema = parentSchemaPath.length === 0 ? // lodash returns wrong value with empty array
-      schemaDraft : get(schemaDraft, path.slice(0, path.length - 2));
+  return produce(schema, (schemaDraft) => {
+    const parentSchema =
+      parentSchemaPath.length === 0 // lodash returns wrong value with empty array
+        ? schemaDraft
+        : get(schemaDraft, path.slice(0, path.length - 2));
 
     if (!parentSchema.required) {
       parentSchema.required = [];
@@ -54,12 +58,16 @@ export const setPropertyRequire = (schema: JSONSchema7, path: string[], require:
       delete parentSchema.required;
     }
   });
-}
+};
 
-export const setPropertyKeywordValue = (schema: JSONSchema7, path: string[], value: string | number | boolean): JSONSchema7 => {
+export const setPropertyKeywordValue = (
+  schema: JSONSchema7,
+  path: string[],
+  value: string | number | boolean
+): JSONSchema7 => {
   validatePropertyPath(schema, path);
 
-  return produce(schema, schemaDraft => {
+  return produce(schema, (schemaDraft) => {
     set(schemaDraft, path, value);
   });
 };
@@ -67,7 +75,7 @@ export const setPropertyKeywordValue = (schema: JSONSchema7, path: string[], val
 export const setPropertyType = (schema: JSONSchema7, path: string[], newType: JSONSchema7TypeName): JSONSchema7 => {
   validatePropertyPath(schema, path);
 
-  return produce(schema, schemaDraft => {
+  return produce(schema, (schemaDraft) => {
     const previousProperty = get(schemaDraft, path);
     const newProperty: JSONSchema7 = {
       type: newType,

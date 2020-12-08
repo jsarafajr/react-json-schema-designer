@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChakraProvider } from '@chakra-ui/react'
+import { ChakraProvider } from '@chakra-ui/react';
 import { JSONSchema7 } from 'json-schema';
 import { theme } from '../theme';
 import { SchemaTree } from './SchemaTree';
@@ -15,7 +15,7 @@ export const SchemaDesigner = (props: SchemaDesignerProps) => {
   const [schema, setSchema] = useState(props.defaultSchema);
 
   const updatePropertyName = (path: string[], newName: string) => {
-    setSchema(prevSchema => {
+    setSchema((prevSchema) => {
       const nextSchema = renameProperty(prevSchema, path, newName);
       props.onChange?.(nextSchema);
       return nextSchema;
@@ -23,15 +23,15 @@ export const SchemaDesigner = (props: SchemaDesignerProps) => {
   };
 
   const updatePropertyType = (path: string[], newType: PropertyType) => {
-    setSchema(prevSchema => {
+    setSchema((prevSchema) => {
       const nextSchema = setPropertyType(prevSchema, path, newType);
       props.onChange?.(nextSchema);
       return nextSchema;
-    })
+    });
   };
 
   const updatePropertyKeyword = (path: string[], value: string | number) => {
-    setSchema(prevSchema => {
+    setSchema((prevSchema) => {
       const nextSchema = setPropertyKeywordValue(prevSchema, path, value);
       props.onChange?.(nextSchema);
       return nextSchema;
@@ -39,7 +39,7 @@ export const SchemaDesigner = (props: SchemaDesignerProps) => {
   };
 
   const updatePropertyRequiredStatus = (path: string[], requiredStatus: boolean) => {
-    setSchema(prevSchema => {
+    setSchema((prevSchema) => {
       const nextSchema = setPropertyRequire(prevSchema, path, requiredStatus);
       props.onChange?.(nextSchema);
       return nextSchema;
@@ -56,5 +56,5 @@ export const SchemaDesigner = (props: SchemaDesignerProps) => {
         onPropertyKeywordUpdate={updatePropertyKeyword}
       />
     </ChakraProvider>
-  )
+  );
 };

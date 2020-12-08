@@ -33,22 +33,20 @@ const SchemaTreeItem = (props: SchemaTreeItemProps) => {
         actions={{
           toggleCollapse: onToggle,
           onNameChange: (newName: string) => props.onPropertyNameChange(props.path, newName),
-          onRequiredChange: (newValue => props.onPropertyRequiredChange(props.path, newValue)),
+          onRequiredChange: (newValue) => props.onPropertyRequiredChange(props.path, newValue),
           onTypeChange: (newType: PropertyType) => props.onPropertyTypeChange(props.path, newType),
           onFieldChange: (newName: string) => props.onPropertyKeywordUpdate(props.path, newName),
         }}
       />
-      {
-        props.schema.type === 'object' && props.schema.properties &&
-        <Collapse in={isOpen} unmountOnExit={true}> {/* https://github.com/chakra-ui/chakra-ui/issues/2534 */ }
-          <SchemaTree
-            {...props}
-            depth={props.depth + 1}
-          />
+      {props.schema.type === 'object' && props.schema.properties && (
+        <Collapse in={isOpen} unmountOnExit={true}>
+          {' '}
+          {/* https://github.com/chakra-ui/chakra-ui/issues/2534 */}
+          <SchemaTree {...props} depth={props.depth + 1} />
         </Collapse>
-      }
+      )}
     </>
-  )
+  );
 };
 
 export const SchemaTree = (props: SchemaTreeProps) => {
@@ -60,14 +58,14 @@ export const SchemaTree = (props: SchemaTreeProps) => {
 
   return (
     <Stack>
-      {
-        Object.entries(properties).map(([propertyName, propertySchema], index) => {
-          if (typeof propertySchema === 'boolean') {
-            // TODO: handle this
-            return '';
-          }
+      {Object.entries(properties).map(([propertyName, propertySchema], index) => {
+        if (typeof propertySchema === 'boolean') {
+          // TODO: handle this
+          return '';
+        }
 
-          return <SchemaTreeItem
+        return (
+          <SchemaTreeItem
             {...props}
             key={index}
             propertyName={propertyName}
@@ -76,8 +74,8 @@ export const SchemaTree = (props: SchemaTreeProps) => {
             path={[...path, 'properties', propertyName]}
             depth={depth}
           />
-        })
-      }
+        );
+      })}
     </Stack>
-  )
+  );
 };

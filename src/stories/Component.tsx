@@ -16,9 +16,7 @@ export const Component = (props: ComponentProps) => {
         <SchemaDesigner defaultSchema={props.schema} onChange={setSchema} />
       </Box>
       <Box>
-        <pre style={{ fontSize: '10px' }}>
-          {JSON.stringify(schema, null, 2)}
-        </pre>
+        <pre style={{ fontSize: '10px' }}>{JSON.stringify(schema, null, 2)}</pre>
       </Box>
     </Flex>
   );

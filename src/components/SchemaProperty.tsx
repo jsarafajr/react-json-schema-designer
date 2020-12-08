@@ -17,7 +17,7 @@ type Props = {
     onRequiredChange: (newValue: boolean) => void;
     onNameChange: (newName: string) => void;
     onFieldChange: (fieldName: string, newValue: string) => void;
-  }
+  };
 };
 
 const SHIFT_STEP_WIDTH = 25;
@@ -48,37 +48,35 @@ export const SchemaProperty = (props: Props) => {
             />
           </HStack>
         </Flex>
-        <Checkbox isChecked={props.required} onChange={e => props.actions.onRequiredChange(e.target.checked)} />
-        <Select size="sm" w={'10em'} value={props.type}
-                onChange={e => props.actions.onTypeChange(e.target.value as PropertyType)}>
-          {
-            Object.values(PropertyType).map(type => <option key={type}>{type}</option>)
-          }
+        <Checkbox isChecked={props.required} onChange={(e) => props.actions.onRequiredChange(e.target.checked)} />
+        <Select
+          size="sm"
+          w={'10em'}
+          value={props.type}
+          onChange={(e) => props.actions.onTypeChange(e.target.value as PropertyType)}
+        >
+          {Object.values(PropertyType).map((type) => (
+            <option key={type}>{type}</option>
+          ))}
         </Select>
         <HStack spacing={0}>
-          <ActionButton
-            icon="edit"
-            active={isEditing}
-            onClick={() => setIsEditing(isEditing => !isEditing)}
-          />
+          <ActionButton icon="edit" active={isEditing} onClick={() => setIsEditing((isEditing) => !isEditing)} />
           <ActionButton icon="delete" />
         </HStack>
       </HStack>
-      {
-        isEditing && (
-          <Flex>
-            <Spacer maxW={`${depthShift + 8}px`} />
-            <Box>
-              <Divider orientation="vertical" opacity={1} />
-            </Box>
-            <Spacer maxW="46px" />
-            <Box flex={1}>
-              <OptionsForm />
-            </Box>
-            <Spacer maxW="40px" />
-          </Flex>
-        )
-      }
+      {isEditing && (
+        <Flex>
+          <Spacer maxW={`${depthShift + 8}px`} />
+          <Box>
+            <Divider orientation="vertical" opacity={1} />
+          </Box>
+          <Spacer maxW="46px" />
+          <Box flex={1}>
+            <OptionsForm />
+          </Box>
+          <Spacer maxW="40px" />
+        </Flex>
+      )}
     </>
-  )
+  );
 };

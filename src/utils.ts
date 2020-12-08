@@ -11,7 +11,7 @@ export const renameObjectKey = (input: Record<string, unknown>, oldKey: string, 
 };
 
 export const renameInArray = (input: string[], oldValue: string, newValue: string): string[] => {
-  return input.map(value => {
+  return input.map((value) => {
     if (value === oldValue) {
       return newValue;
     }

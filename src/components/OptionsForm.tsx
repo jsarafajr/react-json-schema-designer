@@ -10,7 +10,9 @@ export const OptionsForm = () => {
       <InputFormControl label="Description" placeholder="Enter description" />
       <OptionsFormString />
       <Flex justify="flex-end">
-        <Button size="sm" variant="outline">Close</Button>
+        <Button size="sm" variant="outline">
+          Close
+        </Button>
       </Flex>
     </Stack>
   );

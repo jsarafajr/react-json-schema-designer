@@ -18,29 +18,23 @@ type Props = {
   numberMax?: number;
 };
 
-export const InputFormControl = ({
-  label,
-  placeholder,
-  type = 'text',
-  numberMin,
-  numberMax,
-}: Props) => {
+export const InputFormControl = ({ label, placeholder, type = 'text', numberMin, numberMax }: Props) => {
   return (
     <FormControl mb={2}>
-      <FormLabel fontSize="xs" mb={1}>{label}</FormLabel>
-      {
-        type === 'number' ? (
-          <NumberInput size="sm" min={numberMin} max={numberMax}>
-            <NumberInputField placeholder={placeholder} />
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
-        ) : (
-          <Input size="sm" type={type} placeholder={placeholder} />
-        )
-      }
+      <FormLabel fontSize="xs" mb={1}>
+        {label}
+      </FormLabel>
+      {type === 'number' ? (
+        <NumberInput size="sm" min={numberMin} max={numberMax}>
+          <NumberInputField placeholder={placeholder} />
+          <NumberInputStepper>
+            <NumberIncrementStepper />
+            <NumberDecrementStepper />
+          </NumberInputStepper>
+        </NumberInput>
+      ) : (
+        <Input size="sm" type={type} placeholder={placeholder} />
+      )}
     </FormControl>
   );
-}
+};
