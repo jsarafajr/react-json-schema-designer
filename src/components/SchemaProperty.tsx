@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Checkbox, Flex, HStack, Input, Select, Spacer } from '@chakra-ui/react';
+import { Box, Checkbox, Flex, HStack, Input, Select, Spacer, Divider } from '@chakra-ui/react';
 import { PropertyType } from '../constants';
 import { ActionButton } from './ActionButton';
 import { OptionsForm } from './OptionsForm';
@@ -20,7 +20,7 @@ type Props = {
   }
 };
 
-const SHIFT_STEP_WIDTH = 30;
+const SHIFT_STEP_WIDTH = 25;
 
 export const SchemaProperty = (props: Props) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -31,8 +31,8 @@ export const SchemaProperty = (props: Props) => {
     <>
       <HStack>
         <Flex width="100%">
-          <Spacer />
-          <HStack spacing="2px" width={`calc(100% - ${depthShift}px)`}>
+          <Spacer maxW={`${depthShift}px`} />
+          <HStack spacing="2px" flex={1}>
             <ActionButton dimmed icon="drag-handle" />
             <ActionButton
               hidden={![PropertyType.OBJECT, PropertyType.ARRAY].includes(props.type)}
@@ -49,7 +49,7 @@ export const SchemaProperty = (props: Props) => {
           </HStack>
         </Flex>
         <Checkbox isChecked={props.required} onChange={e => props.actions.onRequiredChange(e.target.checked)} />
-        <Select size="sm" w={'14em'} value={props.type}
+        <Select size="sm" w={'10em'} value={props.type}
                 onChange={e => props.actions.onTypeChange(e.target.value as PropertyType)}>
           {
             Object.values(PropertyType).map(type => <option key={type}>{type}</option>)
@@ -67,8 +67,15 @@ export const SchemaProperty = (props: Props) => {
       {
         isEditing && (
           <Flex>
-            <Spacer />
-            <OptionsForm />
+            <Spacer maxW={`${depthShift + 8}px`} />
+            <Box>
+              <Divider orientation="vertical" opacity={1} />
+            </Box>
+            <Spacer maxW="46px" />
+            <Box flex={1}>
+              <OptionsForm />
+            </Box>
+            <Spacer maxW="40px" />
           </Flex>
         )
       }
