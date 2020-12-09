@@ -72,7 +72,9 @@ export const SchemaProperty = (props: Props) => {
           </Box>
           <Spacer maxW="46px" />
           <Box flex={1}>
-            <OptionsForm />
+            <OptionsForm
+              type={props.type}
+            />
           </Box>
           <Spacer maxW="40px" />
         </Flex>

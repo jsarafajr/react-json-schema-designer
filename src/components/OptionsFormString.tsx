@@ -7,8 +7,8 @@ export const OptionsFormString = () => {
   return (
     <>
       <HStack>
-        <InputFormControl type="number" label="Min Length" placeholder="Enter number" />
-        <InputFormControl type="number" label="Max Length" placeholder="Enter number" />
+        <InputFormControl type="number" numberMin={0} label="Min Length" placeholder="Enter number" />
+        <InputFormControl type="number" numberMin={0} label="Max Length" placeholder="Enter number" />
       </HStack>
       <Box>
         <CreatableListFormControl />

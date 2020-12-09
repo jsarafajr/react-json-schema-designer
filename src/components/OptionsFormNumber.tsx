@@ -6,8 +6,8 @@ export const OptionsFormNumber = () => {
   return (
     <>
       <HStack>
-        <InputFormControl type="number" label="Min Length" placeholder="Enter number" />
-        <InputFormControl type="number" label="Max Length" placeholder="Enter number" />
+        <InputFormControl type="number" label="Min" placeholder="Enter number" />
+        <InputFormControl type="number" label="Max" placeholder="Enter number" />
       </HStack>
     </>
   );

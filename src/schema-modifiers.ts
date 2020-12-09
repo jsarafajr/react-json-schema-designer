@@ -81,6 +81,12 @@ export const setPropertyType = (schema: JSONSchema7, path: string[], newType: JS
       type: newType,
     };
 
+    if (newType === 'array') {
+      newProperty.items = {
+        type: 'string',
+      }
+    }
+
     if (previousProperty.title) newProperty.title = previousProperty.title;
     if (previousProperty.description) newProperty.description = previousProperty.description;
 
