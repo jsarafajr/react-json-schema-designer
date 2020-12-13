@@ -3,7 +3,7 @@ import { ChakraProvider } from '@chakra-ui/react';
 import { JSONSchema7 } from 'json-schema';
 import { theme } from '../theme';
 import { SchemaTree } from './SchemaTree';
-import { setPropertyKeywordValue, renameProperty, setPropertyRequire, setPropertyType } from '../schema-modifiers';
+import * as schemaModifiers from '../schema-modifiers';
 import { PropertyType } from '../constants';
 
 export type SchemaDesignerProps = {
@@ -16,7 +16,7 @@ export const SchemaDesigner = (props: SchemaDesignerProps) => {
 
   const updatePropertyName = (path: string[], newName: string) => {
     setSchema((prevSchema) => {
-      const nextSchema = renameProperty(prevSchema, path, newName);
+      const nextSchema = schemaModifiers.renameProperty(prevSchema, path, newName);
       props.onChange?.(nextSchema);
       return nextSchema;
     });
@@ -24,7 +24,7 @@ export const SchemaDesigner = (props: SchemaDesignerProps) => {
 
   const updatePropertyType = (path: string[], newType: PropertyType) => {
     setSchema((prevSchema) => {
-      const nextSchema = setPropertyType(prevSchema, path, newType);
+      const nextSchema = schemaModifiers.setPropertyType(prevSchema, path, newType);
       props.onChange?.(nextSchema);
       return nextSchema;
     });
@@ -32,7 +32,7 @@ export const SchemaDesigner = (props: SchemaDesignerProps) => {
 
   const updatePropertyKeyword = (path: string[], value: string | number) => {
     setSchema((prevSchema) => {
-      const nextSchema = setPropertyKeywordValue(prevSchema, path, value);
+      const nextSchema = schemaModifiers.setPropertyKeywordValue(prevSchema, path, value);
       props.onChange?.(nextSchema);
       return nextSchema;
     });
@@ -40,7 +40,23 @@ export const SchemaDesigner = (props: SchemaDesignerProps) => {
 
   const updatePropertyRequiredStatus = (path: string[], requiredStatus: boolean) => {
     setSchema((prevSchema) => {
-      const nextSchema = setPropertyRequire(prevSchema, path, requiredStatus);
+      const nextSchema = schemaModifiers.setPropertyRequire(prevSchema, path, requiredStatus);
+      props.onChange?.(nextSchema);
+      return nextSchema;
+    });
+  };
+
+  const addSubProperty = (path: string[]) => {
+    setSchema((prevSchema) => {
+      const nextSchema = schemaModifiers.addNewProperty(prevSchema, path);
+      props.onChange?.(nextSchema);
+      return nextSchema;
+    });
+  };
+
+  const removeProperty = (path: string[]) => {
+    setSchema((prevSchema) => {
+      const nextSchema = schemaModifiers.removeProperty(prevSchema, path);
       props.onChange?.(nextSchema);
       return nextSchema;
     });
@@ -54,6 +70,8 @@ export const SchemaDesigner = (props: SchemaDesignerProps) => {
         onPropertyTypeChange={updatePropertyType}
         onPropertyRequiredChange={updatePropertyRequiredStatus}
         onPropertyKeywordUpdate={updatePropertyKeyword}
+        onSubPropertyAdd={addSubProperty}
+        onPropertyRemove={removeProperty}
       />
     </ChakraProvider>
   );

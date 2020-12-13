@@ -2,7 +2,7 @@ import React from 'react';
 import { HStack } from '@chakra-ui/react';
 import { InputFormControl } from './formControls/InputFormControl';
 
-export const OptionsFormObject = () => {
+export const OptionsFormArray = () => {
   return (
     <>
       <HStack>

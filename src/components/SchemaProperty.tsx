@@ -9,14 +9,18 @@ type Props = {
   name: string;
   required: boolean;
   type: PropertyType;
-  title?: string;
+  collapsible?: boolean;
   collapsed?: boolean;
+  disabled?: boolean;
+  hasNested?: boolean;
   actions: {
     toggleCollapse: () => void;
     onTypeChange: (newType: PropertyType) => void;
     onRequiredChange: (newValue: boolean) => void;
     onNameChange: (newName: string) => void;
     onFieldChange: (fieldName: string, newValue: string) => void;
+    onSubPropertyAdd: () => void;
+    onRemove: () => void;
   };
 };
 
@@ -35,20 +39,29 @@ export const SchemaProperty = (props: Props) => {
           <HStack spacing="2px" flex={1}>
             <ActionButton dimmed icon="drag-handle" />
             <ActionButton
-              hidden={![PropertyType.OBJECT, PropertyType.ARRAY].includes(props.type)}
               icon={props.collapsed ? 'chevron-right' : 'chevron-down'}
+              hidden={!props.collapsible}
               onClick={props.actions.toggleCollapse}
             />
-            <ActionButton hidden={props.type !== PropertyType.OBJECT} icon="add" />
+            <ActionButton
+              icon="add"
+              hidden={props.type !== PropertyType.OBJECT}
+              onClick={props.actions.onSubPropertyAdd}
+            />
             <Input
               placeholder="Enter name"
               size="sm"
               value={props.name}
+              isDisabled={props.disabled}
               onChange={(e) => props.actions.onNameChange(e.target.value)}
             />
           </HStack>
         </Flex>
-        <Checkbox isChecked={props.required} onChange={(e) => props.actions.onRequiredChange(e.target.checked)} />
+        <Checkbox
+          isChecked={props.required}
+          isDisabled={props.disabled}
+          onChange={(e) => props.actions.onRequiredChange(e.target.checked)}
+        />
         <Select
           size="sm"
           w={'10em'}
@@ -61,7 +74,7 @@ export const SchemaProperty = (props: Props) => {
         </Select>
         <HStack spacing={0}>
           <ActionButton icon="edit" active={isEditing} onClick={() => setIsEditing((isEditing) => !isEditing)} />
-          <ActionButton icon="delete" />
+          <ActionButton icon="delete" onClick={props.actions.onRemove} />
         </HStack>
       </HStack>
       {isEditing && (
@@ -72,9 +85,7 @@ export const SchemaProperty = (props: Props) => {
           </Box>
           <Spacer maxW="46px" />
           <Box flex={1}>
-            <OptionsForm
-              type={props.type}
-            />
+            <OptionsForm type={props.type} onClose={() => setIsEditing(false)} />
           </Box>
           <Spacer maxW="40px" />
         </Flex>

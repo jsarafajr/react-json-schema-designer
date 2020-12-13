@@ -19,3 +19,13 @@ export const renameInArray = (input: string[], oldValue: string, newValue: strin
     return value;
   });
 };
+
+export const findAvailableKeyName = (input: Record<string, unknown>, prefix: string): string => {
+  let index = 1;
+
+  while (input[`${prefix}${index}`]) {
+    index++;
+  }
+
+  return `${prefix}${index}`;
+};

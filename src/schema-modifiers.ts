@@ -1,7 +1,7 @@
 import { JSONSchema7, JSONSchema7TypeName } from 'json-schema';
 import { produce } from 'immer';
 import { get, set } from 'lodash-es';
-import { renameInArray, renameObjectKey } from './utils';
+import { findAvailableKeyName, renameInArray, renameObjectKey } from './utils';
 
 const validatePropertyPath = (schema: JSONSchema7, path: string[]): void => {
   if (path.length < 2) {
@@ -76,7 +76,7 @@ export const setPropertyType = (schema: JSONSchema7, path: string[], newType: JS
   validatePropertyPath(schema, path);
 
   return produce(schema, (schemaDraft) => {
-    const previousProperty = get(schemaDraft, path);
+    const oldProperty = get(schemaDraft, path);
     const newProperty: JSONSchema7 = {
       type: newType,
     };
@@ -87,9 +87,48 @@ export const setPropertyType = (schema: JSONSchema7, path: string[], newType: JS
       }
     }
 
-    if (previousProperty.title) newProperty.title = previousProperty.title;
-    if (previousProperty.description) newProperty.description = previousProperty.description;
+    if (oldProperty.title) newProperty.title = oldProperty.title;
+    if (oldProperty.description) newProperty.description = oldProperty.description;
 
     set(schemaDraft, path, newProperty);
+  });
+};
+
+export const addNewProperty = (schema: JSONSchema7, path: string[]): JSONSchema7 => {
+  validatePropertyPath(schema, path);
+
+  return produce(schema, (schemaDraft) => {
+    const property = get(schemaDraft, path);
+
+    if (property.type !== 'object') {
+      throw new Error('adding properties is not allowed to this type');
+    }
+
+    if (!property.properties) {
+      property.properties = {};
+    }
+
+    const newPropertyName = findAvailableKeyName(property.properties, 'newProperty');
+
+    property.properties[newPropertyName] = {
+      type: 'string'
+    }
+  });
+};
+
+export const removeProperty = (schema: JSONSchema7, path: string[]): JSONSchema7 => {
+  validatePropertyPath(schema, path);
+
+  const fieldName = path[path.length - 1];
+  const parentSchemaPath = path.slice(0, path.length - 2);
+
+  return produce(schema, (schemaDraft) => {
+    const parentProperty = get(schemaDraft, parentSchemaPath);
+
+    delete parentProperty.properties[fieldName];
+
+    if (!Object.keys(parentProperty.properties).length) {
+      delete parentProperty.properties;
+    }
   });
 };
