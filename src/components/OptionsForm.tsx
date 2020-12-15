@@ -1,24 +1,26 @@
 import React, { ReactNode } from 'react';
 import { Stack, Flex, Button } from '@chakra-ui/react';
+import { JSONSchema7TypeName } from 'json-schema';
 import { InputFormControl } from './formControls/InputFormControl';
 import { OptionsFormString } from './OptionsFormString';
-import { PropertyType } from '../constants';
 import { OptionsFormObject } from './OptionsFormObject';
 import { OptionsFormNumber } from './OptionsFormNumber';
 import { OptionsFormArray } from './OptionsFormArray';
 
 type Props = {
-  type: PropertyType;
+  type: JSONSchema7TypeName;
   onClose: () => void;
 };
 
 export const OptionsForm = ({ type, onClose }: Props) => {
-  const typeOptions: Record<PropertyType, ReactNode> = {
-    [PropertyType.OBJECT]: <OptionsFormObject />,
-    [PropertyType.STRING]: <OptionsFormString />,
-    [PropertyType.NUMBER]: <OptionsFormNumber />,
-    [PropertyType.BOOLEAN]: <></>,
-    [PropertyType.ARRAY]: <OptionsFormArray />,
+  const typeOptions: Record<JSONSchema7TypeName, ReactNode> = {
+    object: <OptionsFormObject />,
+    string: <OptionsFormString />,
+    number: <OptionsFormNumber />,
+    boolean: <></>,
+    array: <OptionsFormArray />,
+    integer: <>not supported</>,
+    null: <>not supported</>,
   };
 
   return (

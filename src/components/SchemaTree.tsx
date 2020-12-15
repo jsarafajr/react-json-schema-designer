@@ -1,16 +1,15 @@
 import React from 'react';
-import { JSONSchema7 } from 'json-schema';
+import { JSONSchema7, JSONSchema7TypeName } from 'json-schema';
 import { Stack, Collapse, useDisclosure } from '@chakra-ui/react';
 import { DragDropContext, Droppable, Draggable, OnDragEndResponder } from 'react-beautiful-dnd';
 import { SchemaProperty } from './SchemaProperty';
-import { PropertyType } from '../constants';
 
 export type SchemaTreeProps = {
   schema: JSONSchema7;
   path?: string[];
   depth?: number;
   onPropertyNameChange: (path: string[], name: string) => void;
-  onPropertyTypeChange: (path: string[], type: PropertyType) => void;
+  onPropertyTypeChange: (path: string[], type: JSONSchema7TypeName) => void;
   onPropertyKeywordUpdate: (path: string[], value: string) => void;
   onPropertyRequiredChange: (path: string[], required: boolean) => void;
   onPropertyRemove: (path: string[]) => void;
@@ -37,7 +36,7 @@ const SchemaTreeItem = (props: SchemaTreeItemProps) => {
             name={props.propertyName}
             required={props.required}
             disabled={props.static}
-            type={props.schema.type! as PropertyType}
+            type={props.schema.type as JSONSchema7TypeName}
             depth={props.depth}
             collapsible={hasSubProperties}
             collapsed={!isOpen}
@@ -46,7 +45,7 @@ const SchemaTreeItem = (props: SchemaTreeItemProps) => {
               toggleCollapse: onToggle,
               onNameChange: (newName: string) => props.onPropertyNameChange(props.path, newName),
               onRequiredChange: (newValue) => props.onPropertyRequiredChange(props.path, newValue),
-              onTypeChange: (newType: PropertyType) => props.onPropertyTypeChange(props.path, newType),
+              onTypeChange: (newType: JSONSchema7TypeName) => props.onPropertyTypeChange(props.path, newType),
               onFieldChange: (newName: string) => props.onPropertyKeywordUpdate(props.path, newName),
               onSubPropertyAdd: () => props.onSubPropertyAdd(props.path),
               onRemove: () => props.onPropertyRemove(props.path),
@@ -75,7 +74,7 @@ const SchemaTreeItem = (props: SchemaTreeItemProps) => {
 };
 
 export const SchemaTree = (props: SchemaTreeProps) => {
-  const { required, properties = {} } = props.schema;
+  const { required, properties = {}, _metadata } = props.schema;
   const depth = props.depth ?? 0;
   const path = props.path ?? [];
 
@@ -88,7 +87,7 @@ export const SchemaTree = (props: SchemaTreeProps) => {
 
   return (
     <DragDropContext onDragEnd={onPropertyDragEnd}>
-      <Droppable droppableId={`droppable_${path.join('_')}`}>
+      <Droppable droppableId={`droppable_${_metadata?.id}`}>
         {(provided) => (
           <Stack py="1px" ref={provided.innerRef} {...provided.droppableProps}>
             {Object.entries(properties).map(([propertyName, propertySchema], index) => {
@@ -100,7 +99,7 @@ export const SchemaTree = (props: SchemaTreeProps) => {
               return (
                 <SchemaTreeItem
                   {...props}
-                  key={`${path.join('_')}${index}`}
+                  key={propertySchema._metadata?.id}
                   propertyIndex={index}
                   propertyName={propertyName}
                   required={isRequired(propertyName)}

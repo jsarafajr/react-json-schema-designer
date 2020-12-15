@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
+import { JSONSchema7TypeName } from 'json-schema';
 import { Box, Checkbox, Flex, HStack, Input, Select, Spacer, Divider } from '@chakra-ui/react';
 import { DraggableProvidedDragHandleProps } from 'react-beautiful-dnd';
-import { PropertyType } from '../constants';
 import { ActionButton } from './ActionButton';
 import { OptionsForm } from './OptionsForm';
 
@@ -9,7 +9,7 @@ type Props = {
   depth: number;
   name: string;
   required: boolean;
-  type: PropertyType;
+  type: JSONSchema7TypeName;
   collapsible?: boolean;
   collapsed?: boolean;
   disabled?: boolean;
@@ -17,7 +17,7 @@ type Props = {
   dragHandleProps?: DraggableProvidedDragHandleProps;
   actions: {
     toggleCollapse: () => void;
-    onTypeChange: (newType: PropertyType) => void;
+    onTypeChange: (newType: JSONSchema7TypeName) => void;
     onRequiredChange: (newValue: boolean) => void;
     onNameChange: (newName: string) => void;
     onFieldChange: (fieldName: string, newValue: string) => void;
@@ -27,6 +27,7 @@ type Props = {
 };
 
 const SHIFT_STEP_WIDTH = 25;
+const supportedTypes: JSONSchema7TypeName[] = ['string', 'number', 'boolean', 'object', 'array'];
 
 export const SchemaProperty = (props: Props) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -45,11 +46,7 @@ export const SchemaProperty = (props: Props) => {
               hidden={!props.collapsible}
               onClick={props.actions.toggleCollapse}
             />
-            <ActionButton
-              icon="add"
-              hidden={props.type !== PropertyType.OBJECT}
-              onClick={props.actions.onSubPropertyAdd}
-            />
+            <ActionButton icon="add" hidden={props.type !== 'object'} onClick={props.actions.onSubPropertyAdd} />
             <Input
               placeholder="Enter name"
               size="sm"
@@ -68,9 +65,9 @@ export const SchemaProperty = (props: Props) => {
           size="sm"
           w={'10em'}
           value={props.type}
-          onChange={(e) => props.actions.onTypeChange(e.target.value as PropertyType)}
+          onChange={(e) => props.actions.onTypeChange(e.target.value as JSONSchema7TypeName)}
         >
-          {Object.values(PropertyType).map((type) => (
+          {supportedTypes.map((type) => (
             <option key={type}>{type}</option>
           ))}
         </Select>

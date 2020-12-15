@@ -1,17 +1,55 @@
 import { JSONSchema7, JSONSchema7TypeName } from 'json-schema';
 import { produce } from 'immer';
-import { get as lodashGet, set } from 'lodash-es';
+import { get as lodashGet, set, omit } from 'lodash-es';
+import { v4 as uuid } from 'uuid';
 import { findAvailableKeyName, renameInArray, renameObjectKey, reorderObjectKey } from './utils';
 
-const get = (input: object, path: string[]) => {
+const get = (immerInput: object, path: string[]) => {
   // lodash returns immer Proxy value when path is empty array
-  return path.length === 0 ? input : lodashGet(input, path);
+  return path.length === 0 ? immerInput : lodashGet(immerInput, path);
 }
 
 const validatePropertyPath = (schema: JSONSchema7, path: string[]): void => {
   if (path.length < 2) {
     throw new Error('wrong property path');
   }
+};
+
+// TODO: traverse
+
+// TODO: dereference
+export const enrichWithMetadata = (schema: JSONSchema7, path: string[] = []): JSONSchema7 => {
+  const schemaWithMetadata: JSONSchema7 = {
+    ...schema,
+    _metadata: {
+      path,
+      id: uuid(),
+    }
+  }
+  
+  if (schema.type === 'object' && schema.properties) {
+    schemaWithMetadata.properties = Object.fromEntries(
+      Object.entries(schema.properties).map(([propertyName, propertySchema]) => {
+        return [propertyName, enrichWithMetadata(propertySchema as JSONSchema7, [...path, 'properties', propertyName])];
+      })
+    );
+  }
+
+  return schemaWithMetadata;
+};
+
+export const stripMetadata = (schemaWithMetadata: JSONSchema7, path: string[] = []): JSONSchema7 => {
+  const schema = omit(schemaWithMetadata, '_metadata');
+
+  if (schema.type === 'object' && schema.properties) {
+    schema.properties = Object.fromEntries(
+      Object.entries(schema.properties).map(([propertyName, propertySchema]) => {
+        return [propertyName, stripMetadata(propertySchema as JSONSchema7, [...path, 'properties', propertyName])];
+      })
+    );
+  }
+
+  return schema;
 };
 
 export const renameProperty = (schema: JSONSchema7, path: string[], newName: string): JSONSchema7 => {

@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { ChakraProvider } from '@chakra-ui/react';
-import { JSONSchema7 } from 'json-schema';
+import { JSONSchema7, JSONSchema7TypeName } from 'json-schema';
 import { theme } from '../theme';
 import { SchemaTree } from './SchemaTree';
 import * as schemaModifiers from '../schema-modifiers';
-import { PropertyType } from '../constants';
 
 export type SchemaDesignerProps = {
   defaultSchema: JSONSchema7;
@@ -12,63 +11,36 @@ export type SchemaDesignerProps = {
 };
 
 export const SchemaDesigner = (props: SchemaDesignerProps) => {
-  const [schema, setSchema] = useState(props.defaultSchema);
+  const [schema, setSchema] = useState(schemaModifiers.enrichWithMetadata(props.defaultSchema));
 
-  const updatePropertyName = (path: string[], newName: string) => {
+  const updateSchemaState = (callback: (prevSchema: JSONSchema7) => JSONSchema7) => {
     setSchema((prevSchema) => {
-      const nextSchema = schemaModifiers.renameProperty(prevSchema, path, newName);
-      props.onChange?.(nextSchema);
+      const nextSchema = callback(prevSchema);
+      props.onChange?.(schemaModifiers.stripMetadata(nextSchema));
       return nextSchema;
     });
   };
 
-  const updatePropertyType = (path: string[], newType: PropertyType) => {
-    setSchema((prevSchema) => {
-      const nextSchema = schemaModifiers.setPropertyType(prevSchema, path, newType);
-      props.onChange?.(nextSchema);
-      return nextSchema;
-    });
-  };
+  const updatePropertyName = (path: string[], newName: string) =>
+    updateSchemaState((prevSchema) => schemaModifiers.renameProperty(prevSchema, path, newName));
 
-  const updatePropertyKeyword = (path: string[], value: string | number) => {
-    setSchema((prevSchema) => {
-      const nextSchema = schemaModifiers.setPropertyKeywordValue(prevSchema, path, value);
-      props.onChange?.(nextSchema);
-      return nextSchema;
-    });
-  };
+  const updatePropertyType = (path: string[], newType: JSONSchema7TypeName) =>
+    updateSchemaState((prevSchema) => schemaModifiers.setPropertyType(prevSchema, path, newType));
 
-  const updatePropertyRequiredStatus = (path: string[], requiredStatus: boolean) => {
-    setSchema((prevSchema) => {
-      const nextSchema = schemaModifiers.setPropertyRequire(prevSchema, path, requiredStatus);
-      props.onChange?.(nextSchema);
-      return nextSchema;
-    });
-  };
+  const updatePropertyKeyword = (path: string[], value: string | number) =>
+    updateSchemaState((prevSchema) => schemaModifiers.setPropertyKeywordValue(prevSchema, path, value));
 
-  const addSubProperty = (path: string[]) => {
-    setSchema((prevSchema) => {
-      const nextSchema = schemaModifiers.addNewSubProperty(prevSchema, path);
-      props.onChange?.(nextSchema);
-      return nextSchema;
-    });
-  };
+  const updatePropertyRequiredStatus = (path: string[], requiredStatus: boolean) =>
+    updateSchemaState((prevSchema) => schemaModifiers.setPropertyRequire(prevSchema, path, requiredStatus));
 
-  const removeProperty = (path: string[]) => {
-    setSchema((prevSchema) => {
-      const nextSchema = schemaModifiers.removeProperty(prevSchema, path);
-      props.onChange?.(nextSchema);
-      return nextSchema;
-    });
-  };
+  const addSubProperty = (path: string[]) =>
+    updateSchemaState((prevSchema) => schemaModifiers.addNewSubProperty(prevSchema, path));
 
-  const reorderSubProperty = (path: string[], fromIndex: number, toIndex: number) => {
-    setSchema((prevSchema) => {
-      const nextSchema = schemaModifiers.reorderSubProperty(prevSchema, path, fromIndex, toIndex);
-      props.onChange?.(nextSchema);
-      return nextSchema;
-    });
-  };
+  const removeProperty = (path: string[]) =>
+    updateSchemaState((prevSchema) => schemaModifiers.removeProperty(prevSchema, path));
+
+  const reorderSubProperty = (path: string[], fromIndex: number, toIndex: number) =>
+    updateSchemaState((prevSchema) => schemaModifiers.reorderSubProperty(prevSchema, path, fromIndex, toIndex));
 
   return (
     <ChakraProvider theme={theme}>
