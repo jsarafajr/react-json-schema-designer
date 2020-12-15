@@ -10,6 +10,16 @@ export const renameObjectKey = (input: Record<string, unknown>, oldKey: string, 
   }, {});
 };
 
+export const reorderObjectKey = (input: Record<string, unknown>, keyIndex: number, newKeyIndex: number) => {
+  const entries = Object.entries(input);
+
+  const element = entries[keyIndex];
+  entries.splice(keyIndex, 1);
+  entries.splice(newKeyIndex, 0, element);
+
+  return Object.fromEntries(entries);
+};
+
 export const renameInArray = (input: string[], oldValue: string, newValue: string): string[] => {
   return input.map((value) => {
     if (value === oldValue) {

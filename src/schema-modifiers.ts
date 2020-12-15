@@ -1,7 +1,12 @@
 import { JSONSchema7, JSONSchema7TypeName } from 'json-schema';
 import { produce } from 'immer';
-import { get, set } from 'lodash-es';
-import { findAvailableKeyName, renameInArray, renameObjectKey } from './utils';
+import { get as lodashGet, set } from 'lodash-es';
+import { findAvailableKeyName, renameInArray, renameObjectKey, reorderObjectKey } from './utils';
+
+const get = (input: object, path: string[]) => {
+  // lodash returns immer Proxy value when path is empty array
+  return path.length === 0 ? input : lodashGet(input, path);
+}
 
 const validatePropertyPath = (schema: JSONSchema7, path: string[]): void => {
   if (path.length < 2) {
@@ -17,10 +22,7 @@ export const renameProperty = (schema: JSONSchema7, path: string[], newName: str
   const parentSchemaPath = path.slice(0, path.length - 2);
 
   return produce(schema, (schemaDraft) => {
-    const parentSchema =
-      parentSchemaPath.length === 0 // lodash returns wrong value with empty array
-        ? schemaDraft
-        : get(schemaDraft, path.slice(0, path.length - 2));
+    const parentSchema = get(schemaDraft, parentSchemaPath);
 
     parentSchema.properties = renameObjectKey(parentSchema.properties, oldName, newName);
 
@@ -37,10 +39,7 @@ export const setPropertyRequire = (schema: JSONSchema7, path: string[], require:
   const parentSchemaPath = path.slice(0, path.length - 2);
 
   return produce(schema, (schemaDraft) => {
-    const parentSchema =
-      parentSchemaPath.length === 0 // lodash returns wrong value with empty array
-        ? schemaDraft
-        : get(schemaDraft, path.slice(0, path.length - 2));
+    const parentSchema = get(schemaDraft, parentSchemaPath);
 
     if (!parentSchema.required) {
       parentSchema.required = [];
@@ -94,7 +93,24 @@ export const setPropertyType = (schema: JSONSchema7, path: string[], newType: JS
   });
 };
 
-export const addNewProperty = (schema: JSONSchema7, path: string[]): JSONSchema7 => {
+export const reorderSubProperty = (
+  schema: JSONSchema7,
+  path: string[],
+  fromIndex: number,
+  toIndex: number
+): JSONSchema7 => {
+  return produce(schema, (schemaDraft) => {
+    const parentProperty = get(schemaDraft, path);
+
+    if (parentProperty.type !== 'object' || !parentProperty.properties) {
+      throw new Error('reordering allowed only for objects');
+    }
+
+    parentProperty.properties = reorderObjectKey(parentProperty.properties, fromIndex, toIndex);
+  });
+};
+
+export const addNewSubProperty = (schema: JSONSchema7, path: string[]): JSONSchema7 => {
   validatePropertyPath(schema, path);
 
   return produce(schema, (schemaDraft) => {

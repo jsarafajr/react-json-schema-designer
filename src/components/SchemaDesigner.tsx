@@ -48,7 +48,7 @@ export const SchemaDesigner = (props: SchemaDesignerProps) => {
 
   const addSubProperty = (path: string[]) => {
     setSchema((prevSchema) => {
-      const nextSchema = schemaModifiers.addNewProperty(prevSchema, path);
+      const nextSchema = schemaModifiers.addNewSubProperty(prevSchema, path);
       props.onChange?.(nextSchema);
       return nextSchema;
     });
@@ -57,6 +57,14 @@ export const SchemaDesigner = (props: SchemaDesignerProps) => {
   const removeProperty = (path: string[]) => {
     setSchema((prevSchema) => {
       const nextSchema = schemaModifiers.removeProperty(prevSchema, path);
+      props.onChange?.(nextSchema);
+      return nextSchema;
+    });
+  };
+
+  const reorderSubProperty = (path: string[], fromIndex: number, toIndex: number) => {
+    setSchema((prevSchema) => {
+      const nextSchema = schemaModifiers.reorderSubProperty(prevSchema, path, fromIndex, toIndex);
       props.onChange?.(nextSchema);
       return nextSchema;
     });
@@ -72,6 +80,7 @@ export const SchemaDesigner = (props: SchemaDesignerProps) => {
         onPropertyKeywordUpdate={updatePropertyKeyword}
         onSubPropertyAdd={addSubProperty}
         onPropertyRemove={removeProperty}
+        onSubPropertyReorder={reorderSubProperty}
       />
     </ChakraProvider>
   );

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Checkbox, Flex, HStack, Input, Select, Spacer, Divider } from '@chakra-ui/react';
+import { DraggableProvidedDragHandleProps } from 'react-beautiful-dnd';
 import { PropertyType } from '../constants';
 import { ActionButton } from './ActionButton';
 import { OptionsForm } from './OptionsForm';
@@ -13,6 +14,7 @@ type Props = {
   collapsed?: boolean;
   disabled?: boolean;
   hasNested?: boolean;
+  dragHandleProps?: DraggableProvidedDragHandleProps;
   actions: {
     toggleCollapse: () => void;
     onTypeChange: (newType: PropertyType) => void;
@@ -37,7 +39,7 @@ export const SchemaProperty = (props: Props) => {
         <Flex width="100%">
           <Spacer maxW={`${depthShift}px`} />
           <HStack spacing="2px" flex={1}>
-            <ActionButton dimmed icon="drag-handle" />
+            <ActionButton dimmed icon="drag-handle" {...props.dragHandleProps} />
             <ActionButton
               icon={props.collapsed ? 'chevron-right' : 'chevron-down'}
               hidden={!props.collapsible}

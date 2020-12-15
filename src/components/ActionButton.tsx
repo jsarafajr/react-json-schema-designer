@@ -30,21 +30,23 @@ const iconsMap: { [i in IconName]: ReactNode } = {
 };
 
 export const ActionButton = (props: Props) => {
-  const opacity = props.dimmed ? 0.2 : 1;
-  const visibility = props.hidden ? 'hidden' : 'visible';
+  const { icon, active, dimmed, hidden, highlight, onClick, ...rest } = props;
+  const opacity = dimmed ? 0.2 : 1;
+  const visibility = hidden ? 'hidden' : 'visible';
 
   return (
     <Button
+      {...rest}
       width="1em"
       size="xs"
       variant="ghost"
       h="16px"
       minWidth="16px"
-      isActive={props.active}
+      isActive={active}
       css={{ opacity, visibility }}
-      onClick={props.onClick}
+      onClick={onClick}
     >
-      {iconsMap[props.icon]}
+      {iconsMap[icon]}
     </Button>
   );
 };
