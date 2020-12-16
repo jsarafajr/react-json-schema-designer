@@ -1,59 +1,64 @@
 import { JSONSchema7, JSONSchema7TypeName } from 'json-schema';
 import { produce } from 'immer';
-import { get as lodashGet, set, omit } from 'lodash-es';
+import { get as lodashGet, set, omit, mapValues } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 import { findAvailableKeyName, renameInArray, renameObjectKey, reorderObjectKey } from './utils';
+import { PropertyMetadata } from './json-schema-with-metadata';
 
 const get = (immerInput: object, path: string[]) => {
   // lodash returns immer Proxy value when path is empty array
   return path.length === 0 ? immerInput : lodashGet(immerInput, path);
-}
+};
 
-const validatePropertyPath = (schema: JSONSchema7, path: string[]): void => {
+const validateNestedPropertyPath = (schema: JSONSchema7, path: string[]): void => {
   if (path.length < 2) {
     throw new Error('wrong property path');
   }
 };
 
-// TODO: traverse
+const traverseProperties = (
+  schema: JSONSchema7,
+  predicate: (property: JSONSchema7) => JSONSchema7 | void
+): JSONSchema7 => {
+  const traverseHelper = (property: JSONSchema7, path: string[]): JSONSchema7 => {
+    const newSchema: JSONSchema7 = { ...(predicate(property) ?? property) };
 
-// TODO: dereference
-export const enrichWithMetadata = (schema: JSONSchema7, path: string[] = []): JSONSchema7 => {
-  const schemaWithMetadata: JSONSchema7 = {
-    ...schema,
-    _metadata: {
-      path,
-      id: uuid(),
+    if (newSchema.type === 'object' && newSchema.properties) {
+      newSchema.properties = mapValues(newSchema.properties, (propertySchema, propertyName) =>
+        traverseHelper(propertySchema as JSONSchema7, [...path, 'properties', propertyName])
+      );
     }
-  }
-  
-  if (schema.type === 'object' && schema.properties) {
-    schemaWithMetadata.properties = Object.fromEntries(
-      Object.entries(schema.properties).map(([propertyName, propertySchema]) => {
-        return [propertyName, enrichWithMetadata(propertySchema as JSONSchema7, [...path, 'properties', propertyName])];
-      })
-    );
-  }
 
-  return schemaWithMetadata;
+    if (newSchema.type === 'array' && newSchema.items) {
+      newSchema.items = traverseHelper(newSchema.items as JSONSchema7, [...path, 'items']);
+    }
+
+    return newSchema;
+  };
+
+  return traverseHelper(schema, []);
 };
 
-export const stripMetadata = (schemaWithMetadata: JSONSchema7, path: string[] = []): JSONSchema7 => {
-  const schema = omit(schemaWithMetadata, '_metadata');
+// TODO: dereference
+export const enrichWithMetadata = (schema: JSONSchema7): JSONSchema7 => {
+  return traverseProperties(schema, (property) => ({
+    ...property,
+    _metadata: generatePropertyMetadata(property),
+  }));
+};
 
-  if (schema.type === 'object' && schema.properties) {
-    schema.properties = Object.fromEntries(
-      Object.entries(schema.properties).map(([propertyName, propertySchema]) => {
-        return [propertyName, stripMetadata(propertySchema as JSONSchema7, [...path, 'properties', propertyName])];
-      })
-    );
-  }
+export const stripMetadata = (schemaWithMetadata: JSONSchema7): JSONSchema7 => {
+  return traverseProperties(schemaWithMetadata, (property => omit(property, '_metadata')));
+};
 
-  return schema;
+export const generatePropertyMetadata = (schema: JSONSchema7): PropertyMetadata => {
+  return {
+    id: uuid(),
+  };
 };
 
 export const renameProperty = (schema: JSONSchema7, path: string[], newName: string): JSONSchema7 => {
-  validatePropertyPath(schema, path);
+  validateNestedPropertyPath(schema, path);
 
   const oldName = path[path.length - 1];
   // 2 steps back - fieldName and properties
@@ -71,7 +76,7 @@ export const renameProperty = (schema: JSONSchema7, path: string[], newName: str
 };
 
 export const setPropertyRequire = (schema: JSONSchema7, path: string[], require: boolean): JSONSchema7 => {
-  validatePropertyPath(schema, path);
+  validateNestedPropertyPath(schema, path);
 
   const fieldName = path[path.length - 1];
   const parentSchemaPath = path.slice(0, path.length - 2);
@@ -102,7 +107,7 @@ export const setPropertyKeywordValue = (
   path: string[],
   value: string | number | boolean
 ): JSONSchema7 => {
-  validatePropertyPath(schema, path);
+  validateNestedPropertyPath(schema, path);
 
   return produce(schema, (schemaDraft) => {
     set(schemaDraft, path, value);
@@ -110,7 +115,7 @@ export const setPropertyKeywordValue = (
 };
 
 export const setPropertyType = (schema: JSONSchema7, path: string[], newType: JSONSchema7TypeName): JSONSchema7 => {
-  validatePropertyPath(schema, path);
+  validateNestedPropertyPath(schema, path);
 
   return produce(schema, (schemaDraft) => {
     const oldProperty = get(schemaDraft, path);
@@ -118,14 +123,16 @@ export const setPropertyType = (schema: JSONSchema7, path: string[], newType: JS
       type: newType,
     };
 
+    if (oldProperty.title) newProperty.title = oldProperty.title;
+    if (oldProperty.description) newProperty.description = oldProperty.description;
+
     if (newType === 'array') {
       newProperty.items = {
         type: 'string',
-      }
+      };
     }
 
-    if (oldProperty.title) newProperty.title = oldProperty.title;
-    if (oldProperty.description) newProperty.description = oldProperty.description;
+    newProperty._metadata = generatePropertyMetadata(newProperty);
 
     set(schemaDraft, path, newProperty);
   });
@@ -149,8 +156,6 @@ export const reorderSubProperty = (
 };
 
 export const addNewSubProperty = (schema: JSONSchema7, path: string[]): JSONSchema7 => {
-  validatePropertyPath(schema, path);
-
   return produce(schema, (schemaDraft) => {
     const property = get(schemaDraft, path);
 
@@ -163,15 +168,19 @@ export const addNewSubProperty = (schema: JSONSchema7, path: string[]): JSONSche
     }
 
     const newPropertyName = findAvailableKeyName(property.properties, 'newProperty');
+    const newPropertySchema: JSONSchema7 = {
+      type: 'string',
+    };
 
     property.properties[newPropertyName] = {
-      type: 'string'
-    }
+      ...newPropertySchema,
+      _metadata: generatePropertyMetadata(newPropertySchema),
+    };
   });
 };
 
 export const removeProperty = (schema: JSONSchema7, path: string[]): JSONSchema7 => {
-  validatePropertyPath(schema, path);
+  validateNestedPropertyPath(schema, path);
 
   const fieldName = path[path.length - 1];
   const parentSchemaPath = path.slice(0, path.length - 2);

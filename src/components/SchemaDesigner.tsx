@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { ChakraProvider } from '@chakra-ui/react';
+import { ChakraProvider, Stack } from '@chakra-ui/react';
 import { JSONSchema7, JSONSchema7TypeName } from 'json-schema';
 import { theme } from '../theme';
 import { SchemaTree } from './SchemaTree';
 import * as schemaModifiers from '../schema-modifiers';
+import { SchemaRoot } from './SchemaRoot';
 
 export type SchemaDesignerProps = {
   defaultSchema: JSONSchema7;
@@ -44,16 +45,19 @@ export const SchemaDesigner = (props: SchemaDesignerProps) => {
 
   return (
     <ChakraProvider theme={theme}>
-      <SchemaTree
-        schema={schema}
-        onPropertyNameChange={updatePropertyName}
-        onPropertyTypeChange={updatePropertyType}
-        onPropertyRequiredChange={updatePropertyRequiredStatus}
-        onPropertyKeywordUpdate={updatePropertyKeyword}
-        onSubPropertyAdd={addSubProperty}
-        onPropertyRemove={removeProperty}
-        onSubPropertyReorder={reorderSubProperty}
-      />
+      <Stack>
+        <SchemaRoot onSubPropertyAdd={() => addSubProperty([])} />
+        <SchemaTree
+          schema={schema}
+          onPropertyNameChange={updatePropertyName}
+          onPropertyTypeChange={updatePropertyType}
+          onPropertyRequiredChange={updatePropertyRequiredStatus}
+          onPropertyKeywordUpdate={updatePropertyKeyword}
+          onSubPropertyAdd={addSubProperty}
+          onPropertyRemove={removeProperty}
+          onSubPropertyReorder={reorderSubProperty}
+        />
+      </Stack>
     </ChakraProvider>
   );
 };

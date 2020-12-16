@@ -26,6 +26,21 @@ export const schema: JSONSchema7 = {
         },
       },
     },
+    purchaseHistory: {
+      type: 'array',
+      items: {
+        type: 'object',
+        required: ['itemName'],
+        properties: {
+          itemName: {
+            type: 'string',
+          },
+          count: {
+            type: 'number',
+          },
+        },
+      },
+    },
     creditCard: {
       type: 'object',
       properties: {

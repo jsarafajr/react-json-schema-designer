@@ -1,6 +1,7 @@
 import React from 'react';
 import { JSONSchema7, JSONSchema7TypeName } from 'json-schema';
 import { Stack, Collapse, useDisclosure } from '@chakra-ui/react';
+import { omit } from 'lodash-es';
 import { DragDropContext, Droppable, Draggable, OnDragEndResponder } from 'react-beautiful-dnd';
 import { SchemaProperty } from './SchemaProperty';
 
@@ -29,7 +30,7 @@ const SchemaTreeItem = (props: SchemaTreeItemProps) => {
   const hasSubProperties = Boolean(props.schema.type === 'object' && props.schema.properties);
 
   return (
-    <Draggable draggableId={`draggable_${props.path.join('_')}`} index={props.propertyIndex}>
+    <Draggable draggableId={`draggable_${props.schema._metadata?.id}`} index={props.propertyIndex}>
       {(provided) => (
         <Stack ref={provided.innerRef} {...provided.draggableProps}>
           <SchemaProperty
@@ -53,7 +54,10 @@ const SchemaTreeItem = (props: SchemaTreeItemProps) => {
           />
           {hasSubProperties && (
             <Collapse in={isOpen}>
-              <SchemaTree {...props} depth={props.depth + 1} />
+              <SchemaTree
+                {...omit(props, 'static')} // workaround to fix making nested fields static 🙈 fix this
+                depth={props.depth + 1}
+              />
             </Collapse>
           )}
           {props.schema.type === 'array' && props.schema.items && (

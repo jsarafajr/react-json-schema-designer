@@ -10,19 +10,20 @@ type Props = {
   name: string;
   required: boolean;
   type: JSONSchema7TypeName;
+  editable?: boolean;
   collapsible?: boolean;
   collapsed?: boolean;
   disabled?: boolean;
   hasNested?: boolean;
   dragHandleProps?: DraggableProvidedDragHandleProps;
-  actions: {
-    toggleCollapse: () => void;
-    onTypeChange: (newType: JSONSchema7TypeName) => void;
-    onRequiredChange: (newValue: boolean) => void;
-    onNameChange: (newName: string) => void;
-    onFieldChange: (fieldName: string, newValue: string) => void;
-    onSubPropertyAdd: () => void;
-    onRemove: () => void;
+  actions?: {
+    toggleCollapse?: () => void;
+    onTypeChange?: (newType: JSONSchema7TypeName) => void;
+    onRequiredChange?: (newValue: boolean) => void;
+    onNameChange?: (newName: string) => void;
+    onFieldChange?: (fieldName: string, newValue: string) => void;
+    onSubPropertyAdd?: () => void;
+    onRemove?: () => void;
   };
 };
 
@@ -31,8 +32,9 @@ const supportedTypes: JSONSchema7TypeName[] = ['string', 'number', 'boolean', 'o
 
 export const SchemaProperty = (props: Props) => {
   const [isEditing, setIsEditing] = useState(false);
-
   const depthShift = SHIFT_STEP_WIDTH * props.depth;
+
+  const editable = props.editable ?? true;
 
   return (
     <>
@@ -40,40 +42,48 @@ export const SchemaProperty = (props: Props) => {
         <Flex width="100%">
           <Spacer maxW={`${depthShift}px`} />
           <HStack spacing="2px" flex={1}>
-            <ActionButton dimmed icon="drag-handle" {...props.dragHandleProps} />
-            <ActionButton
-              icon={props.collapsed ? 'chevron-right' : 'chevron-down'}
-              hidden={!props.collapsible}
-              onClick={props.actions.toggleCollapse}
-            />
-            <ActionButton icon="add" hidden={props.type !== 'object'} onClick={props.actions.onSubPropertyAdd} />
+            {editable && <ActionButton dimmed hidden={props.disabled} icon="drag-handle" {...props.dragHandleProps} />}
+            {editable && (
+              <ActionButton
+                icon={props.collapsed ? 'chevron-right' : 'chevron-down'}
+                hidden={!props.collapsible}
+                onClick={props.actions?.toggleCollapse}
+              />
+            )}
+            <ActionButton icon="add" hidden={props.type !== 'object'} onClick={props.actions?.onSubPropertyAdd} />
             <Input
               placeholder="Enter name"
               size="sm"
               value={props.name}
-              isDisabled={props.disabled}
-              onChange={(e) => props.actions.onNameChange(e.target.value)}
+              isDisabled={!editable || props.disabled}
+              onChange={(e) => props.actions?.onNameChange?.(e.target.value)}
             />
           </HStack>
         </Flex>
         <Checkbox
           isChecked={props.required}
-          isDisabled={props.disabled}
-          onChange={(e) => props.actions.onRequiredChange(e.target.checked)}
+          isDisabled={!editable || props.disabled}
+          onChange={(e) => props.actions?.onRequiredChange?.(e.target.checked)}
         />
         <Select
           size="sm"
           w={'10em'}
           value={props.type}
-          onChange={(e) => props.actions.onTypeChange(e.target.value as JSONSchema7TypeName)}
+          isDisabled={!editable}
+          onChange={(e) => props.actions?.onTypeChange?.(e.target.value as JSONSchema7TypeName)}
         >
           {supportedTypes.map((type) => (
             <option key={type}>{type}</option>
           ))}
         </Select>
         <HStack spacing={0}>
-          <ActionButton icon="edit" active={isEditing} onClick={() => setIsEditing((isEditing) => !isEditing)} />
-          <ActionButton icon="delete" onClick={props.actions.onRemove} />
+          <ActionButton
+            icon="edit"
+            active={isEditing}
+            hidden={!editable}
+            onClick={() => setIsEditing((isEditing) => !isEditing)}
+          />
+          <ActionButton icon="delete" hidden={!editable} onClick={props.actions?.onRemove} />
         </HStack>
       </HStack>
       {isEditing && (
