@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { ChakraProvider, Stack } from '@chakra-ui/react';
 import { JSONSchema7, JSONSchema7TypeName } from 'json-schema';
-import { theme } from '../theme';
 import { SchemaTree } from './SchemaTree';
 import * as schemaModifiers from '../schema-modifiers';
 import { SchemaRoot } from './SchemaRoot';
@@ -28,7 +27,7 @@ export const SchemaDesigner = (props: SchemaDesignerProps) => {
   const updatePropertyType = (path: string[], newType: JSONSchema7TypeName) =>
     updateSchemaState((prevSchema) => schemaModifiers.setPropertyType(prevSchema, path, newType));
 
-  const updatePropertyKeyword = (path: string[], keyword: string, value: string | string[] | number) =>
+  const updatePropertyKeyword = (path: string[], keyword: string, value?: string | string[] | number) =>
     updateSchemaState((prevSchema) => schemaModifiers.setPropertyKeywordValue(prevSchema, path, keyword, value));
 
   const updatePropertyRequiredStatus = (path: string[], requiredStatus: boolean) =>
@@ -44,7 +43,7 @@ export const SchemaDesigner = (props: SchemaDesignerProps) => {
     updateSchemaState((prevSchema) => schemaModifiers.reorderSubProperty(prevSchema, path, fromIndex, toIndex));
 
   return (
-    <ChakraProvider theme={theme}>
+    <ChakraProvider>
       <Stack>
         <SchemaRoot onSubPropertyAdd={() => addSubProperty([])} />
         <SchemaTree
