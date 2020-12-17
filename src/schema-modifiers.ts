@@ -111,7 +111,7 @@ export const setPropertyKeywordValue = (
   validateNestedPropertyPath(schema, path);
 
   return produce(schema, (schemaDraft) => {
-    if (!value) {
+    if (!value && value !== 0) {
       const property = get(schemaDraft, path);
       delete property[keyword];
     } else {

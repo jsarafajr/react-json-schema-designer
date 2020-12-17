@@ -36,7 +36,7 @@ const OptionsFormString = (props: Props) => {
           label="Enum"
           placeholder="Enter values"
           value={props.schema.enum as string[]}
-          onChange={value => props.onKeywordChange('enum', value)}
+          onChange={(value) => props.onKeywordChange('enum', value)}
         />
       </Box>
     </>
@@ -47,8 +47,20 @@ const OptionsFormNumber = (props: Props) => {
   return (
     <>
       <HStack>
-        <InputFormControl type="number" label="Min" placeholder="Enter number" />
-        <InputFormControl type="number" label="Max" placeholder="Enter number" />
+        <InputFormControl
+          type="number"
+          label="Minimum"
+          placeholder="Enter number"
+          value={props.schema.minimum}
+          onChange={(value) => props.onKeywordChange('minimum', value)}
+        />
+        <InputFormControl
+          type="number"
+          label="Maximum"
+          placeholder="Enter number"
+          value={props.schema.maximum}
+          onChange={(value) => props.onKeywordChange('maximum', value)}
+        />
       </HStack>
     </>
   );
@@ -58,8 +70,22 @@ const OptionsFormObject = (props: Props) => {
   return (
     <>
       <HStack>
-        <InputFormControl type="number" numberMin={0} label="Min Properties" placeholder="Enter number" />
-        <InputFormControl type="number" numberMin={0} label="Max Properties" placeholder="Enter number" />
+        <InputFormControl
+          type="number"
+          numberMin={0}
+          label="Min Properties"
+          placeholder="Enter number"
+          value={props.schema.minProperties}
+          onChange={(value) => props.onKeywordChange('minProperties', value)}
+        />
+        <InputFormControl
+          type="number"
+          numberMin={0}
+          label="Max Properties"
+          placeholder="Enter number"
+          value={props.schema.maxProperties}
+          onChange={(value) => props.onKeywordChange('maxProperties', value)}
+        />
       </HStack>
     </>
   );
@@ -69,8 +95,22 @@ const OptionsFormArray = (props: Props) => {
   return (
     <>
       <HStack>
-        <InputFormControl type="number" numberMin={0} label="Min Items" placeholder="Enter number" />
-        <InputFormControl type="number" numberMin={0} label="Max Items" placeholder="Enter number" />
+        <InputFormControl
+          type="number"
+          numberMin={0}
+          label="Min Items"
+          placeholder="Enter number"
+          value={props.schema.minItems}
+          onChange={(value) => props.onKeywordChange('minItems', value)}
+        />
+        <InputFormControl
+          type="number"
+          numberMin={0}
+          label="Max Items"
+          placeholder="Enter number"
+          value={props.schema.maxItems}
+          onChange={(value) => props.onKeywordChange('maxItems', value)}
+        />
       </HStack>
     </>
   );
