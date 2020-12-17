@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { JSONSchema7TypeName } from 'json-schema';
+import { JSONSchema7, JSONSchema7TypeName } from 'json-schema';
 import { Box, Checkbox, Flex, HStack, Input, Select, Spacer, Divider } from '@chakra-ui/react';
 import { DraggableProvidedDragHandleProps } from 'react-beautiful-dnd';
 import { ActionButton } from './ActionButton';
@@ -9,7 +9,7 @@ type Props = {
   depth: number;
   name: string;
   required: boolean;
-  type: JSONSchema7TypeName;
+  schema: JSONSchema7;
   editable?: boolean;
   collapsible?: boolean;
   collapsed?: boolean;
@@ -21,7 +21,7 @@ type Props = {
     onTypeChange?: (newType: JSONSchema7TypeName) => void;
     onRequiredChange?: (newValue: boolean) => void;
     onNameChange?: (newName: string) => void;
-    onFieldChange?: (fieldName: string, newValue: string) => void;
+    onKeywordChange?: (keyword: string, newValue?: string | string[] | number) => void;
     onSubPropertyAdd?: () => void;
     onRemove?: () => void;
   };
@@ -50,7 +50,11 @@ export const SchemaProperty = (props: Props) => {
                 onClick={props.actions?.toggleCollapse}
               />
             )}
-            <ActionButton icon="add" hidden={props.type !== 'object'} onClick={props.actions?.onSubPropertyAdd} />
+            <ActionButton
+              icon="add"
+              hidden={props.schema.type !== 'object'}
+              onClick={props.actions?.onSubPropertyAdd}
+            />
             <Input
               placeholder="Enter name"
               size="sm"
@@ -68,7 +72,7 @@ export const SchemaProperty = (props: Props) => {
         <Select
           size="sm"
           w={'10em'}
-          value={props.type}
+          value={props.schema.type}
           isDisabled={!editable}
           onChange={(e) => props.actions?.onTypeChange?.(e.target.value as JSONSchema7TypeName)}
         >
@@ -94,7 +98,11 @@ export const SchemaProperty = (props: Props) => {
           </Box>
           <Spacer maxW="46px" />
           <Box flex={1}>
-            <OptionsForm type={props.type} onClose={() => setIsEditing(false)} />
+            <OptionsForm
+              schema={props.schema}
+              onKeywordChange={(keyword, value) => props.actions?.onKeywordChange?.(keyword, value)}
+              onClose={() => setIsEditing(false)}
+            />
           </Box>
           <Spacer maxW="40px" />
         </Flex>

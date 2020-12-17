@@ -28,8 +28,8 @@ export const SchemaDesigner = (props: SchemaDesignerProps) => {
   const updatePropertyType = (path: string[], newType: JSONSchema7TypeName) =>
     updateSchemaState((prevSchema) => schemaModifiers.setPropertyType(prevSchema, path, newType));
 
-  const updatePropertyKeyword = (path: string[], value: string | number) =>
-    updateSchemaState((prevSchema) => schemaModifiers.setPropertyKeywordValue(prevSchema, path, value));
+  const updatePropertyKeyword = (path: string[], keyword: string, value: string | string[] | number) =>
+    updateSchemaState((prevSchema) => schemaModifiers.setPropertyKeywordValue(prevSchema, path, keyword, value));
 
   const updatePropertyRequiredStatus = (path: string[], requiredStatus: boolean) =>
     updateSchemaState((prevSchema) => schemaModifiers.setPropertyRequire(prevSchema, path, requiredStatus));

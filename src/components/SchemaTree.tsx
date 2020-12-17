@@ -11,7 +11,7 @@ export type SchemaTreeProps = {
   depth?: number;
   onPropertyNameChange: (path: string[], name: string) => void;
   onPropertyTypeChange: (path: string[], type: JSONSchema7TypeName) => void;
-  onPropertyKeywordUpdate: (path: string[], value: string) => void;
+  onPropertyKeywordUpdate: (path: string[], keyword: string, value?: string | string[] | number) => void;
   onPropertyRequiredChange: (path: string[], required: boolean) => void;
   onPropertyRemove: (path: string[]) => void;
   onSubPropertyAdd: (path: string[]) => void;
@@ -36,8 +36,8 @@ const SchemaTreeItem = (props: SchemaTreeItemProps) => {
           <SchemaProperty
             name={props.propertyName}
             required={props.required}
+            schema={props.schema}
             disabled={props.static}
-            type={props.schema.type as JSONSchema7TypeName}
             depth={props.depth}
             collapsible={hasSubProperties}
             collapsed={!isOpen}
@@ -47,7 +47,7 @@ const SchemaTreeItem = (props: SchemaTreeItemProps) => {
               onNameChange: (newName: string) => props.onPropertyNameChange(props.path, newName),
               onRequiredChange: (newValue) => props.onPropertyRequiredChange(props.path, newValue),
               onTypeChange: (newType: JSONSchema7TypeName) => props.onPropertyTypeChange(props.path, newType),
-              onFieldChange: (newName: string) => props.onPropertyKeywordUpdate(props.path, newName),
+              onKeywordChange: (keyword, value) => props.onPropertyKeywordUpdate(props.path, keyword, value),
               onSubPropertyAdd: () => props.onSubPropertyAdd(props.path),
               onRemove: () => props.onPropertyRemove(props.path),
             }}

@@ -105,12 +105,18 @@ export const setPropertyRequire = (schema: JSONSchema7, path: string[], require:
 export const setPropertyKeywordValue = (
   schema: JSONSchema7,
   path: string[],
-  value: string | number | boolean
+  keyword: string,
+  value?: string | string[] | number | boolean | null
 ): JSONSchema7 => {
   validateNestedPropertyPath(schema, path);
 
   return produce(schema, (schemaDraft) => {
-    set(schemaDraft, path, value);
+    if (!value) {
+      const property = get(schemaDraft, path);
+      delete property[keyword];
+    } else {
+      set(schemaDraft, [...path, keyword], value);
+    }
   });
 };
 

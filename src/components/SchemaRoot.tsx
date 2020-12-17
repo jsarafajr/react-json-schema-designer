@@ -12,7 +12,7 @@ export const SchemaRoot = (props: Props) => {
       editable={false}
       depth={0}
       name="root"
-      type="object"
+      schema={{ type: "object" }}
       actions={{
         onSubPropertyAdd: props.onSubPropertyAdd,
       }}

@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
 import { useTheme, Theme, FormControl, FormLabel } from '@chakra-ui/react';
-import type { StylesConfig, ValueType } from 'react-select';
+import type { StylesConfig } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
-type Props = {};
+type Props = {
+  label: string;
+  placeholder: string;
+  value?: string[];
+  onChange: (value?: string[]) => void;
+};
 
 const size = 'sm';
 
+// as for now there is no way to easily use chakra style with react-select, revisit this later
 const getSelectStyles = (theme: Theme): StylesConfig => ({
   container: (base) => ({
     ...base,
@@ -38,14 +44,19 @@ const getSelectStyles = (theme: Theme): StylesConfig => ({
 
 export const CreatableListFormControl = (props: Props) => {
   const [inputValue, setInputValue] = useState('');
-  const [value, setValue] = useState<ValueType<{ label: string; value: string }>[]>([]);
 
+  const selectValue = props.value?.map((valueEntry) => ({
+    label: valueEntry,
+    value: valueEntry,
+  })) || [];
+  
+  
   const theme = useTheme<Theme>();
 
   return (
     <FormControl mb={2}>
       <FormLabel fontSize="xs" mb={1}>
-        Enum
+        {props.label}
       </FormLabel>
       <CreatableSelect
         styles={getSelectStyles(theme)}
@@ -54,17 +65,17 @@ export const CreatableListFormControl = (props: Props) => {
         isClearable={false}
         isMulti
         menuIsOpen={false}
-        onChange={(value) => setValue(value as any)}
+        onChange={(newSelectValue) => props.onChange(newSelectValue?.map(selectValueEntry => selectValueEntry.value))}
         onInputChange={setInputValue}
         onKeyDown={(e) => {
           if (inputValue && e.key === 'Enter') {
-            setValue([...value, { label: inputValue, value: inputValue }]);
+            props.onChange([...selectValue.map(selectValueEntry => selectValueEntry.value), inputValue]);
             setInputValue('');
             e.preventDefault();
           }
         }}
-        placeholder="Enter values"
-        value={value}
+        placeholder={props.placeholder}
+        value={selectValue}
       />
     </FormControl>
   );
