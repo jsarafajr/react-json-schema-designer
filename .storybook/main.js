@@ -8,6 +8,10 @@ module.exports = {
   webpackFinal: async (config) => {
     return {
       ...config,
+      node: {
+        ...config.node,
+        fs: 'empty',
+      },
       resolve: {
         ...config.resolve,
         alias: {

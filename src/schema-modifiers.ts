@@ -1,9 +1,10 @@
 import { JSONSchema7, JSONSchema7TypeName } from 'json-schema';
+import derefJSONSchema from 'json-schema-deref-sync';
 import { produce } from 'immer';
 import { get as lodashGet, set, omit, mapValues } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 import { findAvailableKeyName, renameInArray, renameObjectKey, reorderObjectKey } from './utils';
-import { PropertyMetadata } from './json-schema-with-metadata';
+import { PropertyMetadata } from './types/json-schema-with-metadata';
 
 const get = (immerInput: object, path: string[]) => {
   // lodash returns immer Proxy value when path is empty array
@@ -39,16 +40,17 @@ const traverseProperties = (
   return traverseHelper(schema, []);
 };
 
-// TODO: dereference
 export const enrichWithMetadata = (schema: JSONSchema7): JSONSchema7 => {
-  return traverseProperties(schema, (property) => ({
+  const dereferencedSchema = derefJSONSchema(schema, { mergeAdditionalProperties: true });
+
+  return traverseProperties(dereferencedSchema, (property) => ({
     ...property,
     _metadata: generatePropertyMetadata(property),
   }));
 };
 
 export const stripMetadata = (schemaWithMetadata: JSONSchema7): JSONSchema7 => {
-  return traverseProperties(schemaWithMetadata, (property => omit(property, '_metadata')));
+  return traverseProperties(schemaWithMetadata, (property) => omit(property, '_metadata'));
 };
 
 export const generatePropertyMetadata = (schema: JSONSchema7): PropertyMetadata => {

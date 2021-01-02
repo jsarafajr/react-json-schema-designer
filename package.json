@@ -45,6 +45,7 @@
     "framer-motion": "^2.9.4",
     "immer": "^8.0.0",
     "json-schema": "^0.2.5",
+    "json-schema-deref-sync": "^0.14.0",
     "lodash-es": "^4.17.15",
     "react-beautiful-dnd": "^13.0.0",
     "react-select": "^3.1.1",
