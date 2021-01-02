@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { ChakraProvider, Stack } from '@chakra-ui/react';
 import { JSONSchema7, JSONSchema7TypeName } from 'json-schema';
 import { SchemaTree } from './SchemaTree';
+import { SchemaRootProperty } from './SchemaRootProperty';
 import * as schemaModifiers from '../schema-modifiers';
-import { SchemaRoot } from './SchemaRoot';
 
 export type SchemaDesignerProps = {
   defaultSchema: JSONSchema7;
@@ -44,8 +44,8 @@ export const SchemaDesigner = (props: SchemaDesignerProps) => {
 
   return (
     <ChakraProvider>
-      <Stack>
-        <SchemaRoot onSubPropertyAdd={() => addSubProperty([])} />
+      <Stack w="100%">
+        <SchemaRootProperty onSubPropertyAdd={() => addSubProperty([])} />
         <SchemaTree
           schema={schema}
           onPropertyNameChange={updatePropertyName}

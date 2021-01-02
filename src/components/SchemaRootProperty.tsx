@@ -5,7 +5,7 @@ type Props = {
   onSubPropertyAdd: () => void;
 };
 
-export const SchemaRoot = (props: Props) => {
+export const SchemaRootProperty = (props: Props) => {
   return (
     <SchemaProperty
       required
